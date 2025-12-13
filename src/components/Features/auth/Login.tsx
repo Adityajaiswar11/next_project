@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ILogin } from "@/model/login";
+import { ILogin } from "@/types/login";
 import { login } from "@/services/auth/Auth";
 import { toast } from "sonner";
 import { useLayout } from "@/context/LayoutContext";
