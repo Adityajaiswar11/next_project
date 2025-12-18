@@ -1,11 +1,20 @@
-import type { Metadata } from "next";
+"use client";
 import { Login } from "@/components/Features/auth/Login";
-
-export const metadata: Metadata = {
-  title: "Login | My App",
-  description: "Login to My App to securely access your dashboard and manage your account.",
-};
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
+  const { isAuthenticated } = useAuth();
+  useEffect(() => {
+    if (isAuthenticated) {
+      redirect("/dashboard");
+    }
+  }, [isAuthenticated]);
+
+  if (isAuthenticated) {
+    return null;
+  }
+
   return <Login />;
 }

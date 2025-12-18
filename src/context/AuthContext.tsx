@@ -1,6 +1,6 @@
 "use client";
-
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { storageService } from "@/services/storage/storage";
 
 interface IUser {
   id: number;
@@ -17,6 +17,7 @@ interface Ichildren {
 interface AuthContextType {
   user: IUser | null;
   accessToken: string | null;
+  isAuthenticated: boolean;
   login: (data: any) => void;
   logout: () => void;
 }
@@ -26,22 +27,29 @@ const AuthContext = createContext<AuthContextType | null>(null); //create contex
 export const AuthProvider = ({ children }: Ichildren) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  /* Restore auth on refresh */
+  useEffect(() => {
+    const storedUser = storageService.getUser<IUser>();
+    const storedToken = storageService.getAccessToken();
+
+    if (storedUser && storedToken) {
+      setUser(storedUser);
+      setAccessToken(storedToken);
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const login = (data: any) => {
-    setAccessToken(data.accessToken);
-    setUser({
-      id: data.id,
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      image: data.image,
-    });
+    storageService.setAccessToken(data.accessToken);
+    storageService.setUser(data);
+    setIsAuthenticated(true);
   };
 
   const logout = async () => {
-    setUser(null);
-    setAccessToken(null);
-    await fetch("/api/logout", { method: "POST" });
+    storageService.clearAuth();
+    setIsAuthenticated(false);
     window.location.href = "/login";
   };
 
@@ -51,7 +59,8 @@ export const AuthProvider = ({ children }: Ichildren) => {
         user,
         accessToken,
         login,
-        logout
+        logout,
+        isAuthenticated,
       }}
     >
       {children}

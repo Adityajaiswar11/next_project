@@ -9,8 +9,6 @@ export const setAccessToken = (token: string) => {
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  
-  withCredentials: true, // REQUIRED for cookies
 });
 
 // REQUEST
@@ -27,17 +25,14 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const res = await axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/refresh`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         accessToken = res.data.accessToken;
@@ -51,7 +46,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
