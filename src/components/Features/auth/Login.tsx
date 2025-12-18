@@ -2,26 +2,31 @@
 
 import React, { useEffect, useState } from "react";
 import { ILogin } from "@/types/login";
-import { login } from "@/services/auth/Auth";
+import { userlogin } from "@/services/auth/Auth";
 import { toast } from "sonner";
 import { useLayout } from "@/context/LayoutContext";
+import { handleApiError, handleApiSuccess } from "@/lib/toastMessage";
+import { useLoader } from "@/context/LoaderContext";
+import { useAuth } from "@/context/AuthContext";
 
 export const Login = () => {
   const [inputValue, setInputValue] = useState<ILogin>({
     username: "",
     password: "",
   });
-  const { setShowHeader } = useLayout();
+  const { setShowHeader, setShowFooter } = useLayout();
+  const { showLoader, hideLoader, loading } = useLoader();
+  const { login } = useAuth();
 
   useEffect(() => {
     setShowHeader(true);
-
+    setShowFooter(false);
     return () => {
       setShowHeader(false);
+      setShowFooter(true);
     };
   }, []);
 
-  const [loading, setLoading] = useState(false);
 
   const handleChangeInput = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -35,19 +40,26 @@ export const Login = () => {
       toast.error("Please fill all fields");
       return;
     }
-
     try {
-      setLoading(true);
-      await login(inputValue);
+      showLoader();
+      const res = await userlogin(inputValue);
+      if (!res) {
+        handleApiError("Invalid login response");
+        return;
+      }
+      handleApiSuccess(res);
+      login(res);
+      window.location.href = "/dashboard";
     } catch (error) {
-      // error handled globally by axios + sonner
+      handleApiError(error);
     } finally {
-      setLoading(false);
+      hideLoader();
     }
   };
 
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         <h1 className="text-3xl font-bold text-center text-gray-800">
           Welcome Back 👋
@@ -93,7 +105,7 @@ export const Login = () => {
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition font-semibold disabled:opacity-60"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : "Login"}
           </button>
         </div>
 

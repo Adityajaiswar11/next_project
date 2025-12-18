@@ -1,3 +1,4 @@
+import Dashboard from "@/components/pages/Dashboard/Dashboard";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,8 +8,6 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
     return (
-        <div>
-            <h1>Welcome to your Dashboard</h1>
-        </div>
+        <Dashboard />
     );
 }

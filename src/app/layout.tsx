@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/context/AuthContext";
 import { LayoutProvider } from "@/context/LayoutContext";
 import Layout from "@/layout/Layout";
+import { LoaderProvider } from "@/context/LoaderContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,13 +32,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <LayoutProvider>
-            <Toaster position="top-right" duration={4000} richColors />
-            <Layout>{children}</Layout>
-          </LayoutProvider>
-        </AuthProvider>
-
+        <LoaderProvider>
+          <AuthProvider>
+            <LayoutProvider>
+              <Toaster position="top-right" duration={3000} richColors />
+              <Layout>{children}</Layout>
+            </LayoutProvider>
+          </AuthProvider>
+        </LoaderProvider>
       </body>
     </html>
   );
