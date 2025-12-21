@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { NOTIFICATION } from "@/config/notification.message";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export const Login = () => {
   const [inputValue, setInputValue] = useState<ILogin>({
@@ -143,9 +144,9 @@ export const Login = () => {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Don’t have an account?{" "}
-          <span className="text-blue-600 cursor-pointer font-medium">
+          <Link href='/register' className="text-blue-600 cursor-pointer font-medium">
             Sign up
-          </span>
+          </Link>
         </p>
       </div>
     </div>
