@@ -32,14 +32,11 @@ export const AuthProvider = ({ children }: Ichildren) => {
     const storedToken = storageService.getAccessToken();
     const storedGoogleToken = storageService.getRawData(STORAGE_KEYS.GOOGLE_ACCESS_TOKEN);
     const storedUser = storageService.getUser<IUser>();
-    // Restore user first
-    if (storedUser) {
-      setUser(storedUser);
-    }
 
     // check if user is authenticated 
     if ((storedToken || storedGoogleToken) && storedUser) {
       setIsAuthenticated(true);
+      setUser(storedUser);
     } else {
       setIsAuthenticated(false);
     }
