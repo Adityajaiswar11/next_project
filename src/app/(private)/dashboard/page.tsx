@@ -19,6 +19,7 @@ export default function Dashboard() {
       setShowHeader(false);
     }
   }, [isAuthenticated]);
+
     return (
       <div>
         <img

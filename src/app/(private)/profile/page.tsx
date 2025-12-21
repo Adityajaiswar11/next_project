@@ -11,8 +11,8 @@ export default function ProfilePage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated === false) {
-      router.push("/login");
+    if (!isAuthenticated) {
+      router.replace("/login");
     }
 
     setShowHeader(true);
