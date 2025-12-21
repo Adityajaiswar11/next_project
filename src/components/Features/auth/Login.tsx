@@ -22,10 +22,13 @@ export const Login = () => {
   const { setShowHeader, setShowFooter } = useLayout();
   const { showLoader, hideLoader, loading } = useLoader();
   const router = useRouter();
-  const { login, googleLogin } = useAuth();
+  const { login, googleLogin, isAuthenticated } = useAuth();
 
   // handle layout
   useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/profile')
+    }
     setShowHeader(true);
     setShowFooter(false);
     return () => {
@@ -57,9 +60,7 @@ export const Login = () => {
       }
       login(res);
       NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
-      setTimeout(() => {
-        router.push('/profile')
-      }, 1000);
+      router.push('/profile')
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -79,8 +80,6 @@ export const Login = () => {
     googleLogin(res);
     NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
     router.push('/profile')
-    setTimeout(() => {
-    }, 1000);
   };
 
   return (

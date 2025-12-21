@@ -45,9 +45,9 @@ export const AuthProvider = ({ children }: Ichildren) => {
     }
   }, []);
 
-
   const login = (data: any) => {
     storageService.setAccessToken(data.accessToken);
+    storageService.setRawData(STORAGE_KEYS.IS_AUTHENTICATED, true);
     storageService.setUser(data);
     setIsAuthenticated(true);
   };
@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: Ichildren) => {
     if (!token) return;
     // Save raw token
     storageService.setRawData(STORAGE_KEYS.GOOGLE_ACCESS_TOKEN, token);
+    storageService.setRawData(STORAGE_KEYS.IS_AUTHENTICATED, true);
     // Decode user info
     const decodedToken: any = decodeToken(token);
     if (!decodedToken) return;
@@ -76,6 +77,7 @@ export const AuthProvider = ({ children }: Ichildren) => {
   const logout = async () => {
     storageService.clearAuth();
     storageService.removeRawData(STORAGE_KEYS.GOOGLE_ACCESS_TOKEN)
+    storageService.removeRawData(STORAGE_KEYS.IS_AUTHENTICATED)
     setIsAuthenticated(false);
     router.push("/login");
   };

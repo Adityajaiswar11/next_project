@@ -18,7 +18,7 @@ export const headerConfig: HeaderConfig = {
   links: [
     { label: "Home", href: "/", show: true },
     { label: "Dashboard", href: "/dashboard", show: true },
-    { label: "About", href: "/login", show: true },
+    { label: "Profile", href: "/profile", show: true },
     { label: "Contact", href: "/contact", show: true },
   ],
 };
