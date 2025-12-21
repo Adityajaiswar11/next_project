@@ -56,9 +56,9 @@ export const Login = () => {
         return;
       }
       login(res);
+      NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
       setTimeout(() => {
         router.push('/profile')
-        handleApiSuccess(res);
       }, 1000);
     } catch (error) {
       handleApiError(error);
@@ -76,10 +76,10 @@ export const Login = () => {
       handleApiError("Login Failed");
       return;
     }
-    NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
     googleLogin(res);
+    NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
+    router.push('/profile')
     setTimeout(() => {
-      router.push('/profile')
     }, 1000);
   };
 
