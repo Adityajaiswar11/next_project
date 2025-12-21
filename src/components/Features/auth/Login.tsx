@@ -5,9 +5,12 @@ import { ILogin } from "@/types/login";
 import { userlogin } from "@/services/auth/Auth";
 import { toast } from "sonner";
 import { useLayout } from "@/context/LayoutContext";
-import { handleApiError, handleApiSuccess } from "@/lib/toastMessage";
+import { handleApiError, handleApiSuccess, NotificationMessage } from "@/lib/toastMessage";
 import { useLoader } from "@/context/LoaderContext";
 import { useAuth } from "@/context/AuthContext";
+import { GoogleLogin } from "@react-oauth/google";
+import { NOTIFICATION } from "@/config/notification.message";
+import { useRouter } from "next/navigation";
 
 export const Login = () => {
   const [inputValue, setInputValue] = useState<ILogin>({
@@ -16,8 +19,10 @@ export const Login = () => {
   });
   const { setShowHeader, setShowFooter } = useLayout();
   const { showLoader, hideLoader, loading } = useLoader();
-  const { login } = useAuth();
+  const router = useRouter();
+  const { login, googleLogin } = useAuth();
 
+  // handle layout
   useEffect(() => {
     setShowHeader(true);
     setShowFooter(false);
@@ -27,7 +32,7 @@ export const Login = () => {
     };
   }, []);
 
-
+  // handle input change
   const handleChangeInput = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -35,21 +40,22 @@ export const Login = () => {
     setInputValue((prev) => ({ ...prev, [name]: value }));
   };
 
+  // handle login
   const handleLogin = async () => {
     if (!inputValue.username || !inputValue.password) {
-      toast.error("Please fill all fields");
+      NotificationMessage("Please fill all fields", "error");
       return;
     }
     try {
       showLoader();
       const res = await userlogin(inputValue);
       if (!res) {
-        handleApiError("Invalid login response");
+        NotificationMessage("Invalid login response", "error");
         return;
       }
       handleApiSuccess(res);
       login(res);
-      window.location.href = "/dashboard";
+      router.push('/dashboard')
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -57,6 +63,17 @@ export const Login = () => {
     }
   };
 
+  const oauthHandler = (res: any) => {
+    if (!res?.credential) {
+      handleApiError("Login Failed");
+      return;
+    }
+    NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
+    googleLogin(res);
+    setTimeout(() => {
+      router.push('/dashboard')
+    }, 1000);
+  };
 
   return (
     <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
@@ -107,6 +124,21 @@ export const Login = () => {
           >
             {loading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : "Login"}
           </button>
+
+          <div className="flex justify-center items-center">
+            <span className="mx-2 text-gray-500">OR</span>
+          </div>
+
+          <div className="google-wrapper">
+            <GoogleLogin
+              onSuccess={(res) => {
+                oauthHandler(res);
+              }}
+              onError={() => {
+                toast.error("Login Failed");
+              }}
+            />
+          </div>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">

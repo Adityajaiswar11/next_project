@@ -14,3 +14,11 @@ export const handleApiSuccess = (response: any) => {
     toast.success(response.data.message);
   }
 };
+
+export const NotificationMessage = (
+  notification: string,
+  type: "success" | "error" | "warning" | "info",
+) => {
+  toast[type](notification);
+};
+

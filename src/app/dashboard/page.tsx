@@ -1,13 +1,34 @@
-import Dashboard from "@/components/pages/Dashboard/Dashboard";
-import type { Metadata } from "next";
+"use client";
+import { useAuth } from "@/context/AuthContext";
+import { useLayout } from "@/context/LayoutContext";
+import { redirect, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export const metadata: Metadata = {
-    title: "Dashboard",
-    description: "Dashboard page for users",
-};
+export default function Dashboard() {
+  const { user, isAuthenticated } = useAuth();
+  const { setShowHeader } = useLayout();
+  const router = useRouter();
 
-export default async function DashboardPage() {
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      router.push("/login");
+    }
+    setShowHeader(true);
+
+    return () => {
+      setShowHeader(false);
+    }
+  }, [isAuthenticated]);
     return (
-        <Dashboard />
+      <div>
+        <img
+          src={user?.image}
+          alt="User"
+          width={40}
+          height={40}
+        />
+
+        <h1>Welcome {user?.firstName}</h1>
+      </div>
     );
 }
