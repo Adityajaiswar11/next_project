@@ -7,6 +7,7 @@ import { LayoutProvider } from "@/context/LayoutContext";
 import Layout from "@/layout/Layout";
 import { LoaderProvider } from "@/context/LoaderContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GlobalLoader } from "@/components/Common/GlobalLoader/GlobalLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,14 +40,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <GoogleOAuthProvider clientId={clientId || ""}>
-        <LoaderProvider>
-          <AuthProvider>
-            <LayoutProvider>
-              <Toaster position="top-right" duration={3000} richColors />
-              <Layout>{children}</Layout>
-            </LayoutProvider>
-          </AuthProvider>
-        </LoaderProvider>
+          <LoaderProvider>
+            <AuthProvider>
+              <LayoutProvider>
+                {/* <GlobalLoader /> */}
+                <Toaster position="top-right" duration={3000} richColors />
+                <Layout>{children}</Layout>
+              </LayoutProvider>
+            </AuthProvider>
+          </LoaderProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

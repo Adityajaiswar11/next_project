@@ -12,11 +12,12 @@ import { GoogleLogin } from "@react-oauth/google";
 import { NOTIFICATION } from "@/config/notification.message";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/Common/Button/Button";
 
 export const Login = () => {
   const [inputValue, setInputValue] = useState<ILogin>({
-    username: "",
-    password: "",
+    username: "emilys",
+    password: "emilyspass",
   });
   const { setShowHeader, setShowFooter } = useLayout();
   const { showLoader, hideLoader, loading } = useLoader();
@@ -54,13 +55,19 @@ export const Login = () => {
         NotificationMessage("Invalid login response", "error");
         return;
       }
-      handleApiSuccess(res);
       login(res);
-      router.push('/dashboard')
+      setTimeout(() => {
+        router.push('/profile')
+        handleApiSuccess(res);
+      }, 1000);
     } catch (error) {
       handleApiError(error);
     } finally {
       hideLoader();
+      setInputValue({
+        username: "",
+        password: "",
+      });
     }
   };
 
@@ -72,7 +79,7 @@ export const Login = () => {
     NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
     googleLogin(res);
     setTimeout(() => {
-      router.push('/dashboard')
+      router.push('/profile')
     }, 1000);
   };
 
@@ -118,13 +125,13 @@ export const Login = () => {
           </div>
 
           {/* Login Button */}
-          <button
+          <Button
+            loading={loading}
+            text="Login"
+            loadingText="Logging in..."
             onClick={handleLogin}
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition font-semibold disabled:opacity-60"
-          >
-            {loading ? <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : "Login"}
-          </button>
+          />
+
 
           <div className="flex justify-center items-center">
             <span className="mx-2 text-gray-500">OR</span>
@@ -132,12 +139,8 @@ export const Login = () => {
 
           <div className="google-wrapper flex items-center justify-center">
             <GoogleLogin
-              onSuccess={(res) => {
-                oauthHandler(res);
-              }}
-              onError={() => {
-                toast.error("Login Failed");
-              }}
+              onSuccess={(res) => oauthHandler(res)}
+              onError={() => NotificationMessage("Login Failed", "error")}
             />
           </div>
         </div>
