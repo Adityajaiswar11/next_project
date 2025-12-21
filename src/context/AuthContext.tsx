@@ -1,14 +1,10 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { storageService } from "@/services/storage/storage";
-
-interface IUser {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  image?: string;
-}
+import { STORAGE_KEYS } from "@/config/storage.config";
+import { decodeToken } from "@/lib/jwtDecode";
+import { IUser } from "@/types/login";
+import { useRouter } from "next/navigation";
 
 interface Ichildren {
   children: React.ReactNode;
@@ -20,6 +16,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (data: any) => void;
   logout: () => void;
+  googleLogin: (data: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null); //create context
@@ -28,18 +25,26 @@ export const AuthProvider = ({ children }: Ichildren) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const router = useRouter();
 
-  /* Restore auth on refresh */
+  // Restore auth on refresh
   useEffect(() => {
-    const storedUser = storageService.getUser<IUser>();
     const storedToken = storageService.getAccessToken();
-
-    if (storedUser && storedToken) {
+    const storedGoogleToken = storageService.getRawData(STORAGE_KEYS.GOOGLE_ACCESS_TOKEN);
+    const storedUser = storageService.getUser<IUser>();
+    // Restore user first
+    if (storedUser) {
       setUser(storedUser);
-      setAccessToken(storedToken);
+    }
+
+    // check if user is authenticated 
+    if ((storedToken || storedGoogleToken) && storedUser) {
       setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
     }
   }, []);
+
 
   const login = (data: any) => {
     storageService.setAccessToken(data.accessToken);
@@ -47,10 +52,32 @@ export const AuthProvider = ({ children }: Ichildren) => {
     setIsAuthenticated(true);
   };
 
+  const googleLogin = (data: any) => {
+    const token = data?.credential;
+    if (!token) return;
+    // Save raw token
+    storageService.setRawData(STORAGE_KEYS.GOOGLE_ACCESS_TOKEN, token);
+    // Decode user info
+    const decodedToken: any = decodeToken(token);
+    if (!decodedToken) return;
+    // Set user data
+    const userData = {
+      id: decodedToken?.sub,
+      email: decodedToken?.email ?? "",
+      firstName: decodedToken?.given_name ?? "",
+      lastName: decodedToken?.family_name ?? "",
+      image: decodedToken?.picture ?? "",
+    }
+    storageService.setUser(userData);
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
+  // Logout
   const logout = async () => {
     storageService.clearAuth();
+    storageService.removeRawData(STORAGE_KEYS.GOOGLE_ACCESS_TOKEN)
     setIsAuthenticated(false);
-    window.location.href = "/login";
+    router.push("/login");
   };
 
   return (
@@ -60,6 +87,7 @@ export const AuthProvider = ({ children }: Ichildren) => {
         accessToken,
         login,
         logout,
+        googleLogin,
         isAuthenticated,
       }}
     >

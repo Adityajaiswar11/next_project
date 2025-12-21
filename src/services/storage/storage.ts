@@ -1,6 +1,17 @@
 import { STORAGE_KEYS } from "@/config/storage.config";
 
 class StorageService {
+  setRawData(key: string, value: any) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  getRawData(key: string) {
+    return JSON.parse(localStorage.getItem(key) || "{}");
+  }
+
+  removeRawData(key: string) {
+    localStorage.removeItem(key);
+  }
 
   setUser(user: any) {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));

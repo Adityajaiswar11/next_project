@@ -1,5 +1,6 @@
 /* ================= STORAGE KEYS ================= */
 export const STORAGE_KEYS = {
+  ACCESS_TOKEN: "access_token",
   USER: "user",
-  ACCESS_TOKEN: "accessToken",
+  GOOGLE_ACCESS_TOKEN: "google_access_token",
 };
