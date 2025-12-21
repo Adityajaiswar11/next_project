@@ -74,7 +74,7 @@ export const Login = () => {
 
   const oauthHandler = (res: any) => {
     if (!res?.credential) {
-      handleApiError("Login Failed");
+      NotificationMessage(NOTIFICATION.LOGIN_FAILED, "error");
       return;
     }
     googleLogin(res);
