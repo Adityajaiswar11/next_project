@@ -130,7 +130,7 @@ export const Login = () => {
             <span className="mx-2 text-gray-500">OR</span>
           </div>
 
-          <div className="google-wrapper">
+          <div className="google-wrapper flex items-center justify-center">
             <GoogleLogin
               onSuccess={(res) => {
                 oauthHandler(res);
