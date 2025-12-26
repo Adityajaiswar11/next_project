@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { storageService } from "@/services/storage/storage";
 import { STORAGE_KEYS } from "@/config/storage.config";
 import { decodeToken } from "@/lib/jwtDecode";
-import { IUser } from "@/types/login";
+import { IUser } from "@/types/user.types";
 import { useRouter } from "next/navigation";
 
 interface Ichildren {

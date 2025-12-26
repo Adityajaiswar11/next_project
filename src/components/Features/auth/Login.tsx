@@ -1,34 +1,30 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ILogin } from "@/types/login";
-import { userlogin } from "@/services/auth/Auth";
-import { toast } from "sonner";
+import { ILogin } from "@/types/user.types";
 import { useLayout } from "@/context/LayoutContext";
-import { handleApiError, handleApiSuccess, NotificationMessage } from "@/lib/toastMessage";
+import { handleApiError, NotificationMessage } from "@/lib/toastMessage";
 import { useLoader } from "@/context/LoaderContext";
 import { useAuth } from "@/context/AuthContext";
 import { GoogleLogin } from "@react-oauth/google";
 import { NOTIFICATION } from "@/config/notification.message";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/Common/Button/Button";
+import { userlogin, verifyOtp } from "@/services/api/auth/auth";
+import Link from "next/link";
+import { authService } from "@/services/auth/Auth";
 
 export const Login = () => {
   const [inputValue, setInputValue] = useState<ILogin>({
-    username: "emilys",
-    password: "emilyspass",
+    phone: "",
   });
   const { setShowHeader, setShowFooter } = useLayout();
   const { showLoader, hideLoader, loading } = useLoader();
   const router = useRouter();
-  const { login, googleLogin, isAuthenticated } = useAuth();
+  const { login, googleLogin } = useAuth();
 
   // handle layout
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/profile')
-    }
     setShowHeader(true);
     setShowFooter(false);
     return () => {
@@ -47,27 +43,33 @@ export const Login = () => {
 
   // handle login
   const handleLogin = async () => {
-    if (!inputValue.username || !inputValue.password) {
+    if (!inputValue.phone) {
       NotificationMessage("Please fill all fields", "error");
       return;
     }
     try {
       showLoader();
-      const res = await userlogin(inputValue);
+      authService.login()
+      const payload = {
+        phone: inputValue.phone,
+        extension: "+91"
+      }
+      const res = await userlogin(payload);
       if (!res) {
         NotificationMessage("Invalid login response", "error");
         return;
       }
+      const verify = await verifyOtp('LcMZR0UAAAAALgPMcgHwga7gY5p8QMg1Hj-bmUv');
+      console.log(verify)
       login(res);
       NotificationMessage(NOTIFICATION.LOGIN_SUCCESS, "success");
-      router.push('/profile')
+      // router.push('/profile')
     } catch (error) {
       handleApiError(error);
     } finally {
       hideLoader();
       setInputValue({
-        username: "",
-        password: "",
+        phone: "",
       });
     }
   };
@@ -96,20 +98,20 @@ export const Login = () => {
           {/* username */}
           <div>
             <label className="text-sm font-medium text-gray-700">
-              Username
+              Enter Email/Mobile number
             </label>
             <input
               type="text"
-              name="username"
-              placeholder="username"
-              value={inputValue.username}
+              name="phone"
+              placeholder="Enter Email or Mobile number"
+              value={inputValue.phone}
               onChange={handleChangeInput}
               className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
 
           {/* Password */}
-          <div>
+          {/* <div>
             <label className="text-sm font-medium text-gray-700">
               Password
             </label>
@@ -121,12 +123,12 @@ export const Login = () => {
               onChange={handleChangeInput}
               className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             />
-          </div>
+          </div> */}
 
           {/* Login Button */}
           <Button
             loading={loading}
-            text="Login"
+            text="Get OTP"
             loadingText="Logging in..."
             onClick={handleLogin}
           />

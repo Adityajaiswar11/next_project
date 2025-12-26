@@ -1,11 +1,10 @@
 export interface ILogin {
-  username?: string;
-  password?: string;
+  phone?: string;
+  extension?: string;
 }
 
 export interface IRegister {
   username?: string;
-  password?: string;
   firstName?: string;
   lastName?: string;
   image?: string;
@@ -17,4 +16,5 @@ export interface IUser {
   firstName?: string;
   lastName?: string;
   image?: string;
+  provider?: "credentials" | "google" | "otp";
 }
